@@ -67,7 +67,6 @@ public class LigneOperationServiceImpl implements ILigneOperationDAO {
         return null;
     }
 
-    @Transactional
     public LigneOperation create( LigneOperation ligneOperation) {
         return this.getDAO().save(ligneOperation);
     }
@@ -173,7 +172,7 @@ public class LigneOperationServiceImpl implements ILigneOperationDAO {
         this.getDAO().deleteAllById(ids);
     }
 
-    
+
     @Override
     public void deleteAll(Iterable<? extends LigneOperation> ligneOperations) {
         this.getDAO().deleteAll(ligneOperations);
