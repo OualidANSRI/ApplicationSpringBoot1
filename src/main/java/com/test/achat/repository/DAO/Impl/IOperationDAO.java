@@ -3,7 +3,7 @@ import com.test.achat.entity.Operation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository("Operation")
+@Repository("operation")
 public interface IOperationDAO extends JpaRepository<Operation, Integer> {
 
 }

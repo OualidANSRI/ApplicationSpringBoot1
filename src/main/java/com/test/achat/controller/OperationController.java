@@ -1,11 +1,9 @@
 package com.test.achat.controller;
 
-import java.nio.file.AccessDeniedException;
-import java.util.List;
-
 import com.test.achat.entity.Operation;
 import com.test.achat.service.impl.OperationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,73 +11,64 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/operations")
 public class OperationController {
-
-
     @Autowired
-    public OperationServiceImpl operationService;
+    private OperationServiceImpl operationService;
+
+    public OperationServiceImpl getOperationService() {
+        return operationService;
+    }
+
     @RequestMapping(value="createOperation", method= RequestMethod.POST)
-    public ResponseEntity<?> createOperation(@RequestBody Operation operation )
+    public ResponseEntity<Operation> createOperation(@RequestBody Operation operation )
     {
-
-        return ResponseEntity.ok(operationService.create(operation));
+        return ResponseEntity.ok(getOperationService().create(operation));
     }
-
-    /***
-     * return the list of all address
-     *
-     **/
-    @RequestMapping(value="/getAllOperations", method=RequestMethod.GET)
-    public List<Operation> getAllOperations() {
-
-        return operationService.findAll();
+    @RequestMapping(value="getAllOperations", method=RequestMethod.GET)
+    public ResponseEntity getAllOperations()
+    {
+        if(getOperationService().count() != 0)
+        {
+            return ResponseEntity.ok().body(getOperationService().findAll());
+        }
+        return new ResponseEntity("No Operation founded", null, HttpStatusCode.valueOf(404));
     }
-
-    /**
-     * return Address by id
-     *
-     **/
     @RequestMapping(value="/getOperation/{id}", method=RequestMethod.GET)
-    public ResponseEntity<Operation> getOperation(@PathVariable(value = "id") int id) {
-        if (operationService.findById(id) == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok().body(operationService.getById(id));
-        }    }
-
-    /**
-     * modify a given Address in the database
-     *
-
-     * @throws AccessDeniedException
-     */
-
+    public ResponseEntity getOperation(@PathVariable(value = "id") int id)
+    {    if(getOperationService().findById(id).isPresent())
+        {
+            return ResponseEntity.ok().body(getOperationService().findById(id).get());
+        }
+        return new ResponseEntity("No Operation founded", null, HttpStatusCode.valueOf(404));
+    }
     @RequestMapping(value="/updateOperation/{id}", method=RequestMethod.PUT)
-    public ResponseEntity<Operation> updateOperation(@PathVariable(value="id") int id, @RequestBody Operation operation) {
-
-        if (operationService.findById(id) == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            operation = operationService.update(operation);
-            return ResponseEntity.ok().body(operation);
+    public ResponseEntity updateOperation(@PathVariable(value="id") int id, @RequestBody Operation operation)
+    {
+        if (getOperationService().findById(id).isPresent())
+        {
+            operation.setId(id);
+            return ResponseEntity.ok().body(getOperationService().update(operation));
         }
+        return new ResponseEntity("Operation "+id+" not founded", null, HttpStatusCode.valueOf(404));
     }
-
-
-    /**
-     * Delete a given address in the database
-     *
-     * @throws
-     * @throws AccessDeniedException
-     **/
     @RequestMapping(value="/deleteOperation/{id}", method=RequestMethod.DELETE)
-    public ResponseEntity<Operation> deleteOperation(@PathVariable(value = "id") int id)
-            throws AccessDeniedException {
-        if (operationService.findById(id) == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            operationService.deleteById(id);
-            return ResponseEntity.ok().build();
-
+    public ResponseEntity<String> deleteOperation(@PathVariable(value = "id") int id)
+    {
+        if (getOperationService().findById(id).isPresent())
+        {
+            getOperationService().deleteById(id);
+            return ResponseEntity.ok("Operation "+id+" deleted");
         }
+        return new ResponseEntity("Operation "+id+" not founded", null, HttpStatusCode.valueOf(404));
     }
+    @RequestMapping(value="/deleteAllOperations", method=RequestMethod.DELETE)
+    public ResponseEntity<String> deleteAllOperations()
+    {
+        if (getOperationService().count() != 0)
+        {
+            getOperationService().deleteAll();
+            return ResponseEntity.ok("All operations deleted successfully !");
+        }
+        return new ResponseEntity("No operation founded", null, HttpStatusCode.valueOf(404));
+    }
+
 }

@@ -1,52 +1,88 @@
 package com.test.achat.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import java.util.*;
 
 @Entity
 @Table(name = "ligneoperations")
 public class LigneOperation{
 
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_lp", nullable = false, updatable = false)
+    @Column(name = "id_lp", nullable = false)
     private int id;
+
+
     //@JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonProperty
+    //@JsonProperty("op")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @JoinColumn(name ="id_operation")
+    @JoinColumn(name ="id_operation", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Operation operation;
+
     //@JsonBackReference
-    @JsonProperty
+    //@JsonProperty("cl")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JoinColumn(name="id_client", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="id_client")
     private Client client;
 
 
-    @Column(name="Status")
-    private String status;
+    //@JsonProperty("statut")
+    @Column(name="statut", nullable = false)
+    private String statut;
 
-    @Column(name="Assignation")
+    //@JsonProperty("assign")
+    @Column(name="Assignation", nullable = false)
     private String assignation;
 
 
-    public String getStatus() {
-        return status;
+    public LigneOperation() {
+    }
+    public LigneOperation(Operation operation, Client client, String statut, String assignation)
+    {
+        this.operation = operation;
+        this.client = client;
+        this.statut = statut;
+        this.assignation = assignation;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+
+    //@ModelAttribute("op")
+    public Operation getOperation() {
+        return operation;
     }
 
+    //@ModelAttribute("op")
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
+
+    //@JsonProperty("cl")
+    public Client getClient() {
+        return client;
+    }
+
+    //@ModelAttribute("cl")
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    //@ModelAttribute("st")
+    public String getStatut() {
+        return statut;
+    }
+
+    //@ModelAttribute("st")
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
+    //@ModelAttribute("assign")
     public String getAssignation() {
         return assignation;
     }
 
+    //@ModelAttribute("assign")
     public void setAssignation(String assignation) {
         this.assignation = assignation;
     }
@@ -58,4 +94,5 @@ public class LigneOperation{
     public void setId(int id) {
         this.id = id;
     }
+
 }
